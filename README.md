@@ -5,8 +5,8 @@ Driver wrapper to handle keytab and principal.
 
 1. Clone repo.
 1. Update gradle.properties  
-  hiveVersion=2.3.2
-  hadoopVersion=1.2.1
+  hiveVersion=1.1.0  
+  hadoopVersion=2.6.0
 1. Test requires docker, since kerberos is required  
    (a) With docker:  
        Build your shadowJar `gradlew clean test shadowJar`   
