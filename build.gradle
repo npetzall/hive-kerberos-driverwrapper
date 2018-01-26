@@ -28,23 +28,11 @@ dependencies {
     compile("org.apache.hive:hive-exec:$hiveVersion") {
         transitive = false
     }
-    compile("org.apache.hadoop:hadoop-core:$hadoopVersion") {
-        exclude group: 'commons-cli'
-        exclude group: 'xmlenc'
-        exclude group: 'com.sun.jersey'
-        exclude group: 'commons-io'
-        exclude group: 'commons-net'
-        exclude group: 'org.mortbay.jetty'
-        exclude group: 'oro'
-        exclude group: 'commons-codec'
-        exclude group: 'org.apache.commons'
-        exclude group: 'tomcat'
-        exclude group: 'commons-el'
-        exclude group: 'hsqldb'
-        exclude group: 'net.java.dev.jets3t'
-        exclude group: 'org.eclipse.jdt'
-        exclude group: 'org.codehaus.jackson'
-        exclude group: 'commons-httpclient'
+    compile("org.apache.hadoop:hadoop-auth:$hadoopVersion") {
+        transitive = false
+    }
+    compile("org.apache.hadoop:hadoop-common:$hadoopVersion") {
+        transitive = false
     }
 }
 
@@ -53,6 +41,23 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.testcontainers:testcontainers:1.5.1'
 }
+
+test {
+    include '**/**/*Test.class'
+    exclude '**/**/*IT.class'
+}
+
+task integrationTest(type: Test) {
+    group 'Verification'
+    description 'run tests where driver is not on classpath, path to driver System.property driverPath'
+    include '**/**/*IT.class'
+    exclude '**/**/*Test.class'
+    systemProperties.put("driverPath", shadowJar.archivePath.toString())
+    classpath = project.sourceSets.test.runtimeClasspath - project.sourceSets.main.runtimeClasspath
+}
+
+integrationTest.dependsOn shadowJar
+check.dependsOn integrationTest
 
 jacoco {
     toolVersion = "$jacocoVersion"

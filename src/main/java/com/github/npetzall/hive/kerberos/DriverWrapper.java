@@ -26,6 +26,7 @@ public class DriverWrapper implements Driver {
   public static final String URL_PREFIX = "jdbc:hive2-kerberos://";
 
   private Driver driver;
+  private ClassLoader originalClassLoader;
 
   public DriverWrapper() {
     try {
@@ -56,10 +57,14 @@ public class DriverWrapper implements Driver {
 
   @Override
   public Connection connect(String url, Properties info) throws SQLException {
+    originalClassLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
     if (Pattern.matches(URL_PREFIX + ".*", url)) {
       url = url.replace(URL_PREFIX, Utils.URL_PREFIX);
     }
-    return driver.connect(url, info);
+    Connection connection = driver.connect(url, info);
+    Thread.currentThread().setContextClassLoader(originalClassLoader);
+    return connection;
   }
 
   @Override
