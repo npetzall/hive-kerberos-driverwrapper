@@ -6,6 +6,9 @@ plugins {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "$distributionRepo"
+    }
 }
 
 apply plugin: 'idea'
@@ -29,7 +32,7 @@ dependencies {
         transitive = false
     }
     compile("org.apache.hadoop:hadoop-auth:$hadoopVersion") {
-        transitive = false
+        transitive = true
     }
     compile("org.apache.hadoop:hadoop-common:$hadoopVersion") {
         transitive = false
@@ -57,6 +60,7 @@ task integrationTest(type: Test) {
 }
 
 integrationTest.dependsOn shadowJar
+integrationTest.mustRunAfter test
 check.dependsOn integrationTest
 
 jacoco {

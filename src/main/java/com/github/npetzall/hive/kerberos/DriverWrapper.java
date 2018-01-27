@@ -3,7 +3,6 @@ package com.github.npetzall.hive.kerberos;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.jdbc.HiveDriver;
-import org.apache.hive.jdbc.Utils;
 
 import java.io.IOException;
 import java.sql.*;
@@ -21,8 +20,10 @@ public class DriverWrapper implements Driver {
     }
   }
 
+
   public static final String PRINCIPAL_PROP = "hive-kerberos-principal";
   public static final String KEYTAB_PROP = "hive-kerberos-keytab";
+  public static final String HIVE_URL_PREFIX = "jdbc:hive2://";
   public static final String URL_PREFIX = "jdbc:hive2-kerberos://";
 
   private Driver driver;
@@ -60,7 +61,7 @@ public class DriverWrapper implements Driver {
     originalClassLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
     if (Pattern.matches(URL_PREFIX + ".*", url)) {
-      url = url.replace(URL_PREFIX, Utils.URL_PREFIX);
+      url = url.replace(URL_PREFIX, HIVE_URL_PREFIX);
     }
     Connection connection = driver.connect(url, info);
     Thread.currentThread().setContextClassLoader(originalClassLoader);
