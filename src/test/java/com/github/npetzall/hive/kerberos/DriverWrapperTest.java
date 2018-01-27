@@ -9,32 +9,43 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.OutputFrame;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.HostPortWaitStrategy;
 import org.testcontainers.containers.wait.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.WaitAllStrategy;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import javax.sound.midi.Patch;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Paths;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OwnClassloaderIT {
+public class DriverWrapperTest {
 
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @ClassRule
     @SuppressWarnings({"rawtypes","unchecked"})
-    public static GenericContainer CDH5_HIVE_KERBEROS = new GenericContainer("hive-kerberos:latest").withCreateContainerCmdModifier((createContainerCmd) -> {
+    public static GenericContainer CDH5_HIVE_KERBEROS =
+            new GenericContainer(
+                    "hive-kerberos:latest"
+            ).withCreateContainerCmdModifier((createContainerCmd) -> {
         ((CreateContainerCmd)createContainerCmd)
                 .withHostName("hadoop-master").withPortBindings(new PortBinding(new Ports.Binding("0.0.0.0","10000"),new ExposedPort(10000, InternetProtocol.TCP)));
     }).waitingFor(new WaitAllStrategy()
@@ -50,33 +61,25 @@ public class OwnClassloaderIT {
     }
 
     @Test
-    public void canCreateDriverWrapper() throws ClassNotFoundException, MalformedURLException, InstantiationException, IllegalAccessException {
-        Driver driverWrapper = createDriverWrapper();
+    public void canCreateDriverWrapper() {
+        DriverWrapper driverWrapper = new DriverWrapper();
         assertThat(driverWrapper).isNotNull();
     }
 
     @Test
-    public void canConnectAndCreateTable() throws SQLException, ClassNotFoundException, MalformedURLException, InstantiationException, IllegalAccessException {
-        Driver driverWrapper = createDriverWrapper();
+    public void canConnectAndCreateTable() throws SQLException {
+        DriverWrapper driverWrapper = new DriverWrapper();
         try (Connection connection = driverWrapper.connect(kdcUtil.getConnectionUrl(), new Properties())){
             JDBCUtil.createAndValidateTable(connection);
         }
     }
 
     @Test
-    public void canConnectWithZookeeperAndCreateTable() throws SQLException, ClassNotFoundException, MalformedURLException, InstantiationException, IllegalAccessException {
-        Driver driverWrapper = createDriverWrapper();
+    public void canConnectWithZookeeperAndCreateTable() throws SQLException {
+        DriverWrapper driverWrapper = new DriverWrapper();
         try (Connection connection = driverWrapper.connect(getConnectionUrl(), new Properties())){
             JDBCUtil.createAndValidateTable(connection);
         }
-    }
-
-    @SuppressWarnings({"unchecked"})
-    private Driver createDriverWrapper() throws MalformedURLException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        URL[] urls = new URL[]{Paths.get(System.getProperty("driverPath")).toUri().toURL()};
-        URLClassLoader urlClassLoader = new URLClassLoader(urls, this.getClass().getClassLoader());
-        Class<Driver> driverClass = (Class<Driver>) Class.forName("com.github.npetzall.hive.kerberos.DriverWrapper",true, urlClassLoader);
-        return driverClass.newInstance();
     }
 
     private String getConnectionUrl() {
