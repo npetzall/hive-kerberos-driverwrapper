@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 
 public class KDCUtil {
 
-    private static final String PRINCIPAL = "hive/hadoop-master@LABS.TERADATA.COM";
+    private static final String PRINCIPAL = "hive/hadoop-master@NPETZALL.GITHUB.COM";
 
     @SuppressWarnings({"rawtypes","unchecked"})
     private final GenericContainer genericContainer;
@@ -40,7 +40,7 @@ public class KDCUtil {
     //Stupid OpenJDK developer not wanting to support custom port in System.properties
     //https://bugs.openjdk.java.net/browse/JDK-6795311
     private void setupConf() throws IOException {
-        String realm = "LABS.TERADATA.COM";
+        String realm = "NPETZALL.GITHUB.COM";
         String kdc = getKDC();
         File krb5Conf = temporaryFolder.newFile();
         try (PrintWriter printWriter = new PrintWriter(new FileWriter(krb5Conf))) {

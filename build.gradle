@@ -34,9 +34,6 @@ dependencies {
     compile("org.apache.hadoop:hadoop-auth:$hadoopVersion") {
         transitive = true
     }
-    compile("org.apache.hadoop:hadoop-common:$hadoopVersion") {
-        transitive = false
-    }
 }
 
 dependencies {
