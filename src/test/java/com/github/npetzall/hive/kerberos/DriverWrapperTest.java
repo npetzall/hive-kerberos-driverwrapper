@@ -44,7 +44,7 @@ public class DriverWrapperTest {
     @SuppressWarnings({"rawtypes","unchecked"})
     public static GenericContainer CDH5_HIVE_KERBEROS =
             new GenericContainer(
-                    "hive-kerberos:latest"
+                    "hdp-hive-kerberized:latest"
             ).withCreateContainerCmdModifier((createContainerCmd) -> {
         ((CreateContainerCmd)createContainerCmd)
                 .withHostName("hadoop-master").withPortBindings(new PortBinding(new Ports.Binding("0.0.0.0","10000"),new ExposedPort(10000, InternetProtocol.TCP)));

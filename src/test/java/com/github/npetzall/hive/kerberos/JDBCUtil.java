@@ -13,13 +13,13 @@ public class JDBCUtil {
     public static void createAndValidateTable(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("create table hiveKerberosTest (key int, value string)");
-            try (ResultSet resultSet = connection.getMetaData().getTables(null, "default", null, new String[]{"TABLES"})) {
+            try (ResultSet resultSet = connection.getMetaData().getTables(null, "default", null, new String[]{"TABLE"})) {
                 resultSet.next();
                 String tableName = resultSet.getString("TABLE_NAME");
                 assertThat(tableName).isEqualToIgnoringCase("hiveKerberosTest");
             }
             statement.execute("drop table if exists hiveKerberosTest");
-            try (ResultSet resultSet = connection.getMetaData().getTables(null, "default", null, new String[]{"TABLES"})) {
+            try (ResultSet resultSet = connection.getMetaData().getTables(null, "default", null, new String[]{"TABLE"})) {
                 assertThat(resultSet.next()).isFalse();
             }
         }

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.time.Duration;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,12 +35,16 @@ public class OwnClassloaderIT {
 
     @ClassRule
     @SuppressWarnings({"rawtypes","unchecked"})
-    public static GenericContainer CDH5_HIVE_KERBEROS = new GenericContainer("hive-kerberos:latest").withCreateContainerCmdModifier((createContainerCmd) -> {
+    public static GenericContainer CDH5_HIVE_KERBEROS = new GenericContainer(
+            "hdp-hive-kerberized:latest"
+    ).withCreateContainerCmdModifier((createContainerCmd) -> {
         ((CreateContainerCmd)createContainerCmd)
                 .withHostName("hadoop-master").withPortBindings(new PortBinding(new Ports.Binding("0.0.0.0","10000"),new ExposedPort(10000, InternetProtocol.TCP)));
     }).waitingFor(new WaitAllStrategy()
             .withStrategy(new LogMessageWaitStrategy().withRegEx(".*bootstrap \\(exit status 0; expected\\)\n"))
-            .withStrategy(new HostPortWaitStrategy()))
+            .withStrategy(new HostPortWaitStrategy())
+            .withStartupTimeout(Duration.ofSeconds(40)))
+            .withStartupTimeout(Duration.ofSeconds(50))
             .withExposedPorts(88,2181,10000);
 
     private static final KDCUtil kdcUtil = new KDCUtil(CDH5_HIVE_KERBEROS, temporaryFolder);
