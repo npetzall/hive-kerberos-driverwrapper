@@ -43,7 +43,7 @@ public class DriverWrapper implements Driver {
     String keytab = System.getProperty(KEYTAB_PROP);
 
     if (principal == null || principal.isEmpty() || keytab == null || keytab.isEmpty()) {
-      throw new IllegalArgumentException("Missing system property 'hive-kerberos-principal' or 'hive-kerberios-keytab");
+      throw new IllegalArgumentException("Missing system property 'h"+ PRINCIPAL_PROP +"' or '" + KEYTAB_PROP +"'");
     }
 
     Configuration conf = new Configuration();

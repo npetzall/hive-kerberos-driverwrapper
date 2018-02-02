@@ -28,6 +28,11 @@ replace `jdbc:hive2://` with `jdbc:hive2-kerberos://` it will be switched back b
 
 All methods are delegated to HiveDriver.
 
+### Cannot locate default realm
+You might be working on a system which hasn't kerberos setup.
+Fear not just add:
+`-Djava.security.krb5.realm=[realm] -Djava.security.krb5.kdc=[kdc host]`
+
 
 ### Class not found
 This might happen you need to switch transitive on one of the compile dependencies.
