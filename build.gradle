@@ -1,6 +1,8 @@
 plugins {
-    id 'com.github.ben-manes.versions' version '0.17.0'
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'java-library'
+    id 'jacoco'
+    id "com.github.ben-manes.versions" version "0.27.0"
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 repositories {
@@ -12,9 +14,7 @@ repositories {
 }
 
 apply plugin: 'idea'
-apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'jacoco'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 compileJava.options.compilerArgs << "-Xlint:all"
@@ -25,21 +25,21 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.apache.hive:hive-jdbc:$hiveVersion:standalone") {
+    implementation ("org.apache.hive:hive-jdbc:$hiveVersion:standalone") {
         transitive = false
     }
-    compile("org.apache.hive:hive-exec:$hiveVersion") {
+    implementation ("org.apache.hive:hive-exec:$hiveVersion") {
         transitive = false
     }
-    compile("org.apache.hadoop:hadoop-auth:$hadoopVersion") {
+    implementation ("org.apache.hadoop:hadoop-auth:$hadoopVersion") {
         transitive = true
     }
 }
 
 dependencies {
-    testCompile "org.assertj:assertj-core:$assertjVersion"
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.testcontainers:testcontainers:1.5.1'
+    testImplementation  "org.assertj:assertj-core:$assertjVersion"
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.testcontainers:testcontainers:1.5.1'
 }
 
 test {
@@ -79,6 +79,6 @@ dependencyUpdates.resolutionStrategy = {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = "$gradleWrapperVersion"
+shadowJar {
+    zip64 true
 }
